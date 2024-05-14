@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { register, login, addBook, allBookData, getBookById, updateBook } from "../controllers/users.controller.js"
+import { register, login, addBook, allBookData, getBookById, updateBook, deleteBook } from "../controllers/users.controller.js"
 
 const router = Router();
 
@@ -14,6 +14,8 @@ router.post("/books", addBook)
 router.get("/books", allBookData)
 router.get("/books/:id", getBookById)
 router.put("/books/:id", updateBook)
+router.delete("/books/:id", deleteBook)
+
 
 // ========================================
 export default router;

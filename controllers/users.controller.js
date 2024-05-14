@@ -51,13 +51,19 @@ export const addBook = async (req, res) => {
     try {
         let {title, author, genre, username} = req.body[0]
         let tcheck = await query(`SELECT * FROM books WHERE title = $1`, [title])
-        if(tcheck.length != 0){
+        if(tcheck.rows.length != 0){
             res.send("This book already exists")
-        }else{
+        }
+        else{
             if(title && author && genre && username){
                 username = await query(`SELECT id FROM users WHERE name = $1`, [username])
-                await query(`INSERT INTO books(title, author, publication_date, genre, user_id) VALUES($1, $2, $3, $4, $5)`, [title, author, genDate(), genre, username.rows[0].id])
-                res.send("added")
+                if(username.rows.length == 0){
+                    res.status(400).send("No user found with provided username")
+                }
+                else{
+                    await query(`INSERT INTO books(title, author, publication_date, genre, user_id) VALUES($1, $2, $3, $4, $5)`, [title, author, genDate(), genre, username.rows[0].id])
+                    res.send("added")
+                }
             }
         }
     } catch (err) {
@@ -93,11 +99,53 @@ export const getBookById = async (req, res) => {
 // PUT BOOK DATA
 export const updateBook = async (req, res) => {
     try {
-        
+        let id = req.params.id
+        let { title, author, publication_date, genre } = req.body[0]
+        if(title.length == 0){
+            title = await query(`SELECT title FROM books WHERE id = $1`, [id])
+            title = title.rows[0].title
+        }
+        else if(author.length == 0){
+            author = await query(`SELECT author FROM books WHERE id = $1`, [id])
+            author = author.rows[0].author
+        }
+        else if(publication_date.length == 0){
+            publication_date = await query(`SELECT publication_date FROM books WHERE id = $1`, [id])
+            publication_date = publication_date.rows[0].publication_date
+        }
+        else if(genre.length == 0){
+            genre = await query(`SELECT genre FROM books WHERE id = $1`, [id])
+            genre = genre.rows[0].genre
+        }
+        await query(`UPDATE books SET title = $1, author = $2, publication_date = $3, genre = $4 WHERE id = $5`, [title, author, publication_date, genre, id])
+        res.send("Updated successfully")
     } catch (err) {
         res.send("An error while updating data")
     }
 }
+
+// DELETE BOOK
+export const deleteBook = async (req, res) => {
+    try {
+        let id = req.params.id
+        await query(`DELETE FROM books WHERE id = $1`, [id])
+        res.send("DELETED data")
+    } catch (err) {
+        res.send("An error while deleting")
+    }
+}
+// =====================================================
+
+
+
+
+
+
+
+
+
+
+
 // try{
 //     query("CREATE TABLE users(id SERIAL PRIMARY KEY, name VARCHAR(30), email VARCHAR(40),password VARCHAR(30), created_at VARCHAR(40))")
 //     query("CREATE TABLE books(id SERIAL PRIMARY KEY, title VARCHAR(30), author VARCHAR(40), publication_date VARCHAR(40), genre VARCHAR(30), user_id INT, FOREIGN KEY(user_id) REFERENCES users(id))")
