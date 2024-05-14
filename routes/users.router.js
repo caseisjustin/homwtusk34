@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { register, login, addBook, allBookData, getBookById, updateBook, deleteBook, addComment, getComments } from "../controllers/users.controller.js"
+import { register, login, addBook, allBookData, getBookById, updateBook, deleteBook, addComment, getComments, addPhoto, getPhotos } from "../controllers/users.controller.js"
 
 const router = Router();
 
@@ -21,5 +21,10 @@ router.delete("/books/:id", deleteBook)
 // COMMENTS
 router.post("/books/:id/comments", addComment)
 router.get("/books/:id/comments", getComments)
+
+
+// PHOTOS
+router.post("/books/:id/photos", addPhoto)
+router.get("/books/:id/photos", getPhotos)
 
 export default router;

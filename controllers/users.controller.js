@@ -145,7 +145,6 @@ export const deleteBook = async (req, res) => {
 // ADD COMMENT TO BOOK
 export const addComment = async (req, res) =>{
     try {
-        let id = req.params.id
         let { text, book_title, username } = req.body[0]
         book_title = await query(`SELECT id FROM books WHERE title = $1`, [book_title])
         username = await query(`SELECT id FROM users WHERE name = $1`, [username])
@@ -166,6 +165,39 @@ export const getComments = async (req, res) => {
         res.send("An error occured reading comments.")
     }
 }
+// =================================================
+
+
+
+
+// PHOTOS
+// ADD PHOTOS TO BOOK
+export const addPhoto = async (req, res) =>{
+    try {
+        let { url, book_title } = req.body[0]
+        book_title = await query(`SELECT id FROM books WHERE title = $1`, [book_title])
+        await query(`INSERT INTO photos(url, uploaded_at, book_id) VALUES($1, $2, $3)`, [url,  genDate(), book_title.rows[0].id])
+        res.send("Added photo SUCCESSFULY")
+    } catch (err) {
+        res.send("An error occured while adding photo.")
+    }
+}
+
+// GET ALL PHOTOS
+export const getPhotos = async (req, res) => {
+    try {
+        let id = req.params.id
+        let result = await query(`SELECT * FROM photos WHERE book_id = $1`, [id])
+        res.send(result.rows)
+    } catch (err) {
+        res.send("An error occured reading comments.")
+    }
+}
+
+
+
+
+
 
 
 
