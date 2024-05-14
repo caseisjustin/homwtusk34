@@ -5,7 +5,7 @@ function genDate(){
     let dat = new Date()
     return `${dat.getHours()}:${dat.getMinutes()}, ${dat.getDate()}/${dat.getMonth()}/${dat.getFullYear()}`
 }
-// user qismi===========================================
+// USERS===========================================
 // USER REGISTR
 export const register = async (req, res) =>{
     try {
@@ -43,6 +43,7 @@ export const login = async (req, res) =>{
     }
 }
 // =====================================================
+
 
 
 
@@ -140,6 +141,31 @@ export const deleteBook = async (req, res) => {
 
 
 
+// COMMENTS
+// ADD COMMENT TO BOOK
+export const addComment = async (req, res) =>{
+    try {
+        let id = req.params.id
+        let { text, book_title, username } = req.body[0]
+        book_title = await query(`SELECT id FROM books WHERE title = $1`, [book_title])
+        username = await query(`SELECT id FROM users WHERE name = $1`, [username])
+        await query(`INSERT INTO comments(text, created_at, book_id, user_id) VALUES($1, $2, $3, $4)`, [text,  genDate(), book_title.rows[0].id, username.rows[0].id])
+        res.send("Added comment SUCCESSFULY")
+    } catch (err) {
+        res.send("An error occured while adding comment.")
+    }
+}
+
+// GET ALL COMMENTS
+export const getComments = async (req, res) => {
+    try {
+        let id = req.params.id
+        let result = await query(`SELECT * FROM comments WHERE book_id = $1`, [id])
+        res.send(result.rows)
+    } catch (err) {
+        res.send("An error occured reading comments.")
+    }
+}
 
 
 
